@@ -1,25 +1,25 @@
 /* ========== Put your GLB filenames/URLs here (23 entries) ========== */
 const modelPaths = [
-  "/bathroom(18x12)1.glb", "/bathroom(18x12)2.glb", "/bathroom(18x12)3.glb",
-  "/bathroom(18x12)4.glb", "/bathroom(18x12)5.glb", "/bathroom(18x12)6.glb",
-  "/bathroom(18x12)7.glb", "/bathroom(18x12)8.glb", "/bathroom(18x12)9.glb",
-  "/bathroom(18x12)10.glb", "/bathroom(18x12)11.glb", "/bathroom(18x12)12.glb",
-  "/bathroom(18x12)13.glb", "/bathroom(18x12)14.glb", "/bathroom(18x12)15.glb",
-  "/bathroom(18x12)16.glb", "/bathroom(18x12)17.glb", "/bathroom(18x12)18.glb",
-  "/bathroom(18x12)19.glb", "/bathroom(18x12)20.glb", "/bathroom(18x12)21.glb",
-  "/bathroom(18x12)22.glb", "/bathroom(18x12)23.glb", ""
+  "/models/bathroom(18x12)1.glb", "/models/bathroom(18x12)2.glb", "/models/bathroom(18x12)3.glb",
+  "/models/bathroom(18x12)4.glb", "/models/bathroom(18x12)5.glb", "/models/bathroom(18x12)6.glb",
+  "/models/bathroom(18x12)7.glb", "/models/bathroom(18x12)8.glb", "/models/bathroom(18x12)9.glb",
+  "/models/bathroom(18x12)10.glb", "/models/bathroom(18x12)11.glb", "/models/bathroom(18x12)12.glb",
+  "/models/bathroom(18x12)13.glb", "/models/bathroom(18x12)14.glb", "/models/bathroom(18x12)15.glb",
+  "/models/bathroom(18x12)16.glb", "/models/bathroom(18x12)17.glb", "/models/bathroom(18x12)18.glb",
+  "/models/bathroom(18x12)19.glb", "/models/bathroom(18x12)20.glb", "/models/bathroom(18x12)21.glb",
+  "/models/bathroom(18x12)22.glb", "/models/bathroom(18x12)23.glb", ""
 ];
 
 /* ========== Put your design image filenames/URLs here (23 entries) ========== */
 const designImages = [
-  "/bathroom3d(18x12)1.png", "/bathroom3d(18x12)2.png", "/bathroom3d(18x12)3.png",
-  "/bathroom3d(18x12)4.png", "/bathroom3d(18x12)5.png", "/bathroom3d(18x12)6.png",
-  "/bathroom3d(18x12)7.png", "/bathroom3d(18x12)8.png", "/bathroom3d(18x12)9.png",
-  "/bathroom3d(18x12)10.png", "/bathroom3d(18x12)11.png", "/bathroom3d(18x12)12.png",
-  "/bathroom3d(18x12)13.png", "/bathroom3d(18x12)14.png", "/bathroom3d(18x12)15.png",
-  "/bathroom3d(18x12)16.png", "/bathroom3d(18x12)17.png", "/bathroom3d(18x12)18.png",
-  "/bathroom3d(18x12)19.png", "/bathroom3d(18x12)20.png", "/bathroom3d(18x12)21.png",
-  "/bathroom3d(18x12)22.png", "/bathroom3d(18x12)11.png", ""
+  "/images/bathroom3d(18x12)1.png", "/images/bathroom3d(18x12)2.png", "/images/bathroom3d(18x12)3.png",
+  "/images/bathroom3d(18x12)4.png", "/images/bathroom3d(18x12)5.png", "/images/bathroom3d(18x12)6.png",
+  "/images/bathroom3d(18x12)7.png", "/images/bathroom3d(18x12)8.png", "/images/bathroom3d(18x12)9.png",
+  "/images/bathroom3d(18x12)10.png", "/images/bathroom3d(18x12)11.png", "/images/bathroom3d(18x12)12.png",
+  "/images/bathroom3d(18x12)13.png", "/images/bathroom3d(18x12)14.png", "/images/bathroom3d(18x12)15.png",
+  "/images/bathroom3d(18x12)16.png", "/images/bathroom3d(18x12)17.png", "/images/bathroom3d(18x12)18.png",
+  "/images/bathroom3d(18x12)19.png", "/images/bathroom3d(18x12)20.png", "/images/bathroom3d(18x12)21.png",
+  "/images/bathroom3d(18x12)22.png", "/images/bathroom3d(18x12)11.png", ""
 ];
 
 /* ========== Mesh name groups ========== */
@@ -435,7 +435,7 @@ function wireUI() {
       const videoStream = renderer.domElement.captureStream(60);
       
       // Setup audio
-      const audio = new Audio("s/background.mp3");
+      const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       

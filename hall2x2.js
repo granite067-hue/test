@@ -8,7 +8,7 @@
 
 /* ========== Put your GLB filenames/URLs here ========== */
 const modelPaths = [
-  "/hall(2x2).glb", "/room(2x2).glb", "/models/.glb",
+  "/models/hall(2x2).glb", "/models/room(2x2).glb", "/models/.glb",
   "/models/.glb", "/models/.glb", "/models/.glb",
   "/models/.glb", "/models/.glb", "/models/.glb",
   "/models/.glb", "/models/.glb", "/models/.glb",
@@ -20,7 +20,7 @@ const modelPaths = [
 
 /* ========== Put your design image filenames/URLs here ========== */
 const designImages = [
-  "/hall.png", "/room.png", "/images/.png",
+  "/images/hall.png", "/images/room.png", "/images/.png",
   "/images/.png", "/images/.png", "/images/.png",
   "/images/.png", "/images/.png", "/images/.png",
   "/images/.png", "/images/.png", "/images/.png",
@@ -575,7 +575,7 @@ function wireUI() {
         const videoStream = renderer.domElement.captureStream(60);
         
         // Setup audio
-        const audio = new Audio("/background.mp3");
+        const audio = new Audio("/audio/background.mp3");
         audio.crossOrigin = "anonymous";
         audio.loop = true;
         

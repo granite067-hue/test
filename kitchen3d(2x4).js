@@ -1,25 +1,25 @@
 /* ========== Put your GLB filenames/URLs here ========== */
 const modelPaths = [
-  "/kitchen(2x4)01.glb", "/kitchen(18x12)4.glb", "/kitchen(2x4)3.glb",
-  "/kitchen(2x4)04.glb", "/kitchen(2x4)05.glb", "/kitchen(2x4)06.glb",
-  "/kitchen(2x4)07.glb", "/kitchen(2x4)08.glb", "/kitchen(2x4)09.glb",
-  "/kitchen(2x4)10.glb", "/kitchen(2x4)11.glb", "/kitchen(2x4)12.glb",
-  "/kitchen(2x4)13.glb", "/kitchen(2x4)14.glb", "/kitchen(2x4)15.glb",
-  "/kitchen(2x4)16.glb", "/kitchen(2x4)17.glb", "/kitchen(2x4)18.glb",
-  "/kitchen(2x4)19.glb", "/kitchen(2x4)20.glb", "/kitchen(2x4)21.glb",
-  "/kitchen(2x4)22.glb", "/kitchen(2x4)23.glb", ""
+  "/models/kitchen(2x4)01.glb", "/models/kitchen(18x12)4.glb", "/models/kitchen(2x4)3.glb",
+  "/models/kitchen(2x4)04.glb", "/models/kitchen(2x4)05.glb", "/models/kitchen(2x4)06.glb",
+  "/models/kitchen(2x4)07.glb", "/models/kitchen(2x4)08.glb", "/models/kitchen(2x4)09.glb",
+  "/models/kitchen(2x4)10.glb", "/models/kitchen(2x4)11.glb", "/models/kitchen(2x4)12.glb",
+  "/models/kitchen(2x4)13.glb", "/models/kitchen(2x4)14.glb", "/models/kitchen(2x4)15.glb",
+  "/models/kitchen(2x4)16.glb", "/models/kitchen(2x4)17.glb", "/models/kitchen(2x4)18.glb",
+  "/models/kitchen(2x4)19.glb", "/models/kitchen(2x4)20.glb", "/models/kitchen(2x4)21.glb",
+  "/models/kitchen(2x4)22.glb", "/models/kitchen(2x4)23.glb", ""
 ];
 
 /* ========== Put your design image filenames/URLs here ========== */
 const designImages = [
-  "/kitchen3d(18x12)3.png", "/kitchen3d(18x12)4.png", "/kitchen3d(18x12)2.png",
-  "/kitchen3d(2x4)4.png", "/kitchen3d(2x4)5.png", "/kitchen3d(2x4)6.png",
-  "/kitchen3d(2x4)7.png", "/kitchen3d(2x4)8.png", "/kitchen3d(2x4)9.png",
-  "/kitchen3d(2x4)10.png", "/kitchen3d(2x4)11.png", "/kitchen3d(2x4)12.png",
-  "/kitchen3d(2x4)13.png", "/kitchen3d(2x4)14.png", "/kitchen3d(2x4)15.png",
-  "/kitchen3d(2x4)16.png", "/kitchen3d(2x4)17.png", "/kitchen3d(2x4)18.png",
-  "/kitchen3d(2x4)19.png", "/kitchen3d(2x4)20.png", "/kitchen3d(2x4)21.png",
-  "/kitchen3d(2x4)22.png", "/kitchen3d(2x4)23.png", ""
+  "/images/kitchen3d(18x12)3.png", "/images/kitchen3d(18x12)4.png", "/images/kitchen3d(18x12)2.png",
+  "/images/kitchen3d(2x4)4.png", "/images/kitchen3d(2x4)5.png", "/images/kitchen3d(2x4)6.png",
+  "/images/kitchen3d(2x4)7.png", "/images/kitchen3d(2x4)8.png", "/images/kitchen3d(2x4)9.png",
+  "/images/kitchen3d(2x4)10.png", "/images/kitchen3d(2x4)11.png", "/images/kitchen3d(2x4)12.png",
+  "/images/kitchen3d(2x4)13.png", "/images/kitchen3d(2x4)14.png", "/images/kitchen3d(2x4)15.png",
+  "/images/kitchen3d(2x4)16.png", "/images/kitchen3d(2x4)17.png", "/images/kitchen3d(2x4)18.png",
+  "/images/kitchen3d(2x4)19.png", "/images/kitchen3d(2x4)20.png", "/images/kitchen3d(2x4)21.png",
+  "/images/kitchen3d(2x4)22.png", "/images/kitchen3d(2x4)23.png", ""
 ];
 
 /* Mesh name groups - L, D, F only (HL removed) */
@@ -395,7 +395,7 @@ function wireUI() {
       
       const videoStream = renderer.domElement.captureStream(60);
       
-      const audio = new Audio("/background.mp3");
+      const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       

@@ -4,22 +4,22 @@
 
 /* ========== Global Variables ========== */
 const modelPaths = [
-  "/parking1.glb", "/parking2.glb", "/parking3.glb",
-  "/parking6.glb", "/parking5.glb", "/parking7.glb",
-  "/parking4.glb", "/models/.glb", "/models/.glb",
-  "//.glb", "/models/.glb", "/models/.glb",
-  "/.glb", "/models/.glb", "/models/.glb",
-  "/.glb", "/models/.glb", ""
+  "/models/parking1.glb", "/models/parking2.glb", "/models/parking3.glb",
+  "/models/parking6.glb", "/models/parking5.glb", "/models/parking7.glb",
+  "/models/parking4.glb", "/models/.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", ""
 ];
 
 /* ========== Put your design image filenames/URLs here ========== */
 const designImages = [
-  "/parking3d1.png", "/parking3d2.png", "/parking3d3.png",
-  "/parking3d4.png", "/parking3d5.png", "/parking3d6.png",
-  "/parking3d7.png", "/parking3d8.png", "/parking3d9.png",
-  "/parking3d10.png", "/parking3d11.png", "/parking3d12.png",
-  "/parking3d13.png", "/parking3d14.png", "/parking3d15.png",
-  "/parking3d16.png", "/parking3d17.png", ""
+  "/images/parking3d1.png", "/images/parking3d2.png", "/images/parking3d3.png",
+  "/images/parking3d4.png", "/images/parking3d5.png", "/images/parking3d6.png",
+  "/images/parking3d7.png", "/images/parking3d8.png", "/images/parking3d9.png",
+  "/images/parking3d10.png", "/images/parking3d11.png", "/images/parking3d12.png",
+  "/images/parking3d13.png", "/images/parking3d14.png", "/images/parking3d15.png",
+  "/images/parking3d16.png", "/images/parking3d17.png", ""
 ];
 
 /* Mesh name groups */
@@ -353,7 +353,7 @@ function wireUI() {
       
       const videoStream = renderer.domElement.captureStream(60);
       
-      const audio = new Audio("/background.mp3");
+      const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       

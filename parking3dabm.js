@@ -4,19 +4,19 @@
 
 /* ========== Global Variables ========== */
 const modelPaths = [
-  "/parkingbm1.glb", "/parkingbm2.glb", "/parkingbm3.glb",
-  "/parkingbm4.glb", "/parkingbm5.glb", "/parkingbm6.glb",
-  "/parkingbm7.glb", "/parkingbm8.glb", "/models/.glb",
-  "/.glb", "/models/.glb", "/models/.glb",
-  "/.glb", "/models/.glb", "/models/.glb",
-  "/.glb", "/models/.glb", ""
+  "/models/parkingbm1.glb", "/models/parkingbm2.glb", "/models/parkingbm3.glb",
+  "/models/parkingbm4.glb", "/models/parkingbm5.glb", "/models/parkingbm6.glb",
+  "/models/parkingbm7.glb", "/models/parkingbm8.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", "/models/.glb",
+  "/models/.glb", "/models/.glb", ""
 ];
 
 /* ========== Put your design image filenames/URLs here ========== */
 const designImages = [
-  "/parking3dbm1.png", "/parking3dbm2.png", "/parking3dbm3.png",
-  "/parking3dbm4.png", "/parking3dbm5.png", "/parking3dbm6.png",
-  "/parking3dbm7.png", "/parking3dbm8.png", "/images/.png",
+  "/images/parking3dbm1.png", "/images/parking3dbm2.png", "/images/parking3dbm3.png",
+  "/images/parking3dbm4.png", "/images/parking3dbm5.png", "/images/parking3dbm6.png",
+  "/images/parking3dbm7.png", "/images/parking3dbm8.png", "/images/.png",
   "/images/.png", "/images/.png", "/images/.png",
   "/images/.png", "/images/.png", "/images/.png",
   "/images/.png", "/images/.png", ""
@@ -349,7 +349,7 @@ function wireUI() {
       
       const videoStream = renderer.domElement.captureStream(60);
       
-      const audio = new Audio("/background.mp3");
+      const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       

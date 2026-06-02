@@ -1,25 +1,25 @@
 /* ========== Put your GLB filenames/URLs here ========== */
 const modelPaths = [
-  "/kitchen(18x12)1.glb", "/kitchen(18x12)2.glb", "/kitchen(18x12)3.glb",
-  "/kitchen(18x12)4.glb", "/kitchen(18x12)5.glb", "/kitchen(18x12)6.glb",
-  "/kitchen(18x12)7.glb", "/kitchen(18x12)8.glb", "/kitchen(18x12)9.glb",
-  "/kitchen(18x12)10.glb", "/kitchen(18x12)11.glb", "/kitchen(18x12)12.glb",
-  "/kitchen(18x12)13.glb", "/kitchen(18x12)14.glb", "/kitchen(18x12)15.glb",
-  "/kitchen(18x12)16.glb", "/kitchen(18x12)17.glb", "/kitchen(18x12)18.glb",
-  "/kitchen(18x12)19.glb", "/kitchen(18x12)20.glb", "/kitchen(18x12)21.glb",
-  "/kitchen(18x12)22.glb", "/kitchen(18x12)23.glb", ""
+  "/models/kitchen(18x12)1.glb", "/models/kitchen(18x12)2.glb", "/models/kitchen(18x12)3.glb",
+  "/models/kitchen(18x12)4.glb", "/models/kitchen(18x12)5.glb", "/models/kitchen(18x12)6.glb",
+  "/models/kitchen(18x12)7.glb", "/models/kitchen(18x12)8.glb", "/models/kitchen(18x12)9.glb",
+  "/models/kitchen(18x12)10.glb", "/models/kitchen(18x12)11.glb", "/models/kitchen(18x12)12.glb",
+  "/models/kitchen(18x12)13.glb", "/models/kitchen(18x12)14.glb", "/models/kitchen(18x12)15.glb",
+  "/models/kitchen(18x12)16.glb", "/models/kitchen(18x12)17.glb", "/models/kitchen(18x12)18.glb",
+  "/models/kitchen(18x12)19.glb", "/models/kitchen(18x12)20.glb", "/models/kitchen(18x12)21.glb",
+  "/models/kitchen(18x12)22.glb", "/models/kitchen(18x12)23.glb", ""
 ];
 
 /* ========== Put your design image filenames/URLs here ========== */
 const designImages = [
-  "/kitchen3d(18x12)1.png", "/kitchen3d(18x12)2.png", "/kitchen3d(18x12)3.png",
-  "/kitchen3d(18x12)4.png", "/kitchen3d(18x12)5.png", "/kitchen3d(18x12)6.png",
-  "/kitchen3d(18x12)7.png", "/kitchen3d(18x12)8.png", "/kitchen3d(18x12)9.png",
-  "/kitchen3d(18x12)10.png", "/kitchen3d(18x12)11.png", "/kitchen3d(18x12)12.png",
-  "/kitchen3d(18x12)13.png", "/kitchen3d(18x12)14.png", "/kitchen3d(18x12)15.png",
-  "/kitchen3d(18x12)16.png", "/kitchen3d(18x12)17.png", "/kitchen3d(18x12)18.png",
-  "/kitchen3d(18x12)19.png", "/kitchen3d(18x12)20.png", "/kitchen3d(18x12)21.png",
-  "/kitchen3d(18x12)22.png", "/kitchen3d(18x12)23.png", ""
+  "/images/kitchen3d(18x12)1.png", "/images/kitchen3d(18x12)2.png", "/images/kitchen3d(18x12)3.png",
+  "/images/kitchen3d(18x12)4.png", "/images/kitchen3d(18x12)5.png", "/images/kitchen3d(18x12)6.png",
+  "/images/kitchen3d(18x12)7.png", "/images/kitchen3d(18x12)8.png", "/images/kitchen3d(18x12)9.png",
+  "/images/kitchen3d(18x12)10.png", "/images/kitchen3d(18x12)11.png", "/images/kitchen3d(18x12)12.png",
+  "/images/kitchen3d(18x12)13.png", "/images/kitchen3d(18x12)14.png", "/images/kitchen3d(18x12)15.png",
+  "/images/kitchen3d(18x12)16.png", "/images/kitchen3d(18x12)17.png", "/images/kitchen3d(18x12)18.png",
+  "/images/kitchen3d(18x12)19.png", "/images/kitchen3d(18x12)20.png", "/images/kitchen3d(18x12)21.png",
+  "/images/kitchen3d(18x12)22.png", "/images/kitchen3d(18x12)23.png", ""
 ];
 
 /* ========== Global Variables ========== */
