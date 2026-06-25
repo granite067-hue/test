@@ -98,7 +98,7 @@ let uploadedTextureL = null, uploadedTextureD = null, uploadedTextureHL = null, 
 
 /* Auto rotation & clock */
 let autoRotate = true;
-let rotationSpeed = 0.6;
+let rotationSpeed = 0.5;
 const clock = new THREE.Clock();
 
 /* Loading flag to prevent concurrent loads */
@@ -113,7 +113,7 @@ function initThree() {
   scene.background = new THREE.Color(0xf0f0f0);
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-  camera.position.set(3, 2, 5);
+  camera.position.set(1.5, 2, 7);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -198,7 +198,7 @@ function loadGLBByIndex(idx) {
       boundingBox.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
       controls.minDistance = Math.max(0.01, maxDim * 0.05);
-      controls.maxDistance = Math.max(maxDim * 0.2, 2.5);
+      controls.maxDistance = Math.max(maxDim * 0.2, 1);
 
       gltfScene.traverse((child) => {
         if (!child.isMesh) return;
