@@ -3,14 +3,14 @@ let currentTileCategory = null;
 
 /* ========== Put your GLB filenames/URLs here (26 entries) ========== */
 const modelPaths = [
-  "/models/bathroom(2x4)1.glb", "/models/bathroom(2x4)2.glb", "/models/bathroom(2x4)24.glb",
-  "/models/bathroom(2x4)23.glb", "/models/bathroom(2x4)5.glb", "/models/bathroom(2x4)6.glb",
+  "/models/bathroom(2x4)1.glb", "/models/bathroom(2x4)2.glb", "/models/bathroom(2x4)3.glb",
+  "/models/bathroom(2x4)4.glb", "/models/bathroom(2x4)5.glb", "/models/bathroom(2x4)6.glb",
   "/models/bathroom(2x4)7.glb", "/models/bathroom(2x4)8.glb", "/models/bathroom(2x4)9.glb",
   "/models/bathroom(2x4)10.glb", "/models/bathroom(2x4)11.glb", "/models/bathroom(2x4)12.glb",
-  "/models/bathroom(2x4)21.glb", "/models/bathroom(2x4)22.glb", "/models/bathroom(2x4)15.glb",
+  "/models/bathroom(2x4)13.glb", "/models/bathroom(2x4)14.glb", "/models/bathroom(2x4)15.glb",
   "/models/bathroom(2x4)16.glb", "/models/bathroom(2x4)17.glb", "/models/bathroom(2x4)18.glb",
-  "/models/bathroom(2x4)13.glb", "/models/bathroom(2x4)14.glb", "/models/bathroom(2x4)19.glb",
-  "/models/bathroom(2x4)20.glb", "/models/bathroom(2x4)4.glb", "/models/bathroom(2x4)3.glb",
+  "/models/bathroom(2x4)19.glb", "/models/bathroom(2x4)20.glb", "/models/bathroom(2x4)21.glb",
+  "/models/bathroom(2x4)22.glb", "/models/bathroom(2x4)23.glb", "/models/bathroom(2x4)24.glb",
   "/models/bathroom(2x4)25.glb", "/models/bathroom(2x4)26.glb"
 ];
 
