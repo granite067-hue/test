@@ -1,7 +1,7 @@
 /* ========== Global Variables ========== */
 let currentTileCategory = null;
 
-/* ========== Put your GLB filenames/URLs here (26 entries) ========== */
+/* ========== Put your GLB filenames/URLs here (28 entries) ========== */
 const modelPaths = [
   "/models/bathroom(2x4)1.glb", "/models/bathroom(2x4)2.glb", "/models/bathroom(2x4)3.glb",
   "/models/bathroom(2x4)4.glb", "/models/bathroom(2x4)5.glb", "/models/bathroom(2x4)6.glb",
@@ -11,10 +11,11 @@ const modelPaths = [
   "/models/bathroom(2x4)16.glb", "/models/bathroom(2x4)17.glb", "/models/bathroom(2x4)18.glb",
   "/models/bathroom(2x4)19.glb", "/models/bathroom(2x4)20.glb", "/models/bathroom(2x4)21.glb",
   "/models/bathroom(2x4)22.glb", "/models/bathroom(2x4)23.glb", "/models/bathroom(2x4)24.glb",
-  "/models/bathroom(2x4)25.glb", "/models/bathroom(2x4)26.glb"
+  "/models/bathroom(2x4)25.glb", "/models/bathroom(2x4)26.glb", "/models/bathroom(2x4)27.glb", 
+  "/models/bathroom(2x4)28.glb"
 ];
 
-/* ========== Put your design image filenames/URLs here (26 entries) ========== */
+/* ========== Put your design image filenames/URLs here (28 entries) ========== */
 const designImages = [
   "/images/bathroom3d(2x4)1.png", "/images/bathroom3d(2x4)2.png", "/images/bathroom3d(2x4)3.png",
   "/images/bathroom3d(2x4)4.png", "/images/bathroom3d(2x4)5.png", "/images/bathroom3d(2x4)6.png",
@@ -24,7 +25,8 @@ const designImages = [
   "/images/bathroom3d(2x4)16.png", "/images/bathroom3d(2x4)17.png", "/images/bathroom3d(2x4)18.png",
   "/images/bathroom3d(2x4)19.png", "/images/bathroom3d(2x4)20.png", "/images/bathroom3d(2x4)21.png",
   "/images/bathroom3d(2x4)22.png", "/images/bathroom3d(2x4)23.png", "/images/bathroom3d(2x4)24.png",
-  "/images/bathroom3d(2x4)25.png", "/images/bathroom3d(2x4)26.png"
+  "/images/bathroom3d(2x4)25.png", "/images/bathroom3d(2x4)26.png", "/images/bathroom3d(2x4)27.png",
+  "/images/bathroom3d(2x4)28.png"
 ];
 
 /* Mesh name groups */
@@ -175,6 +177,10 @@ function loadGLBByIndex(idx) {
 
   isLoading = true;
   disableDesignButtons();
+  
+  // Show global screen loader overlay
+  const screenLoader = document.getElementById('screenLoader');
+  if (screenLoader) screenLoader.style.display = 'flex';
 
   if (gltfScene) {
     scene.remove(gltfScene);
@@ -232,6 +238,9 @@ function loadGLBByIndex(idx) {
 
       isLoading = false;
       enableDesignButtons();
+      
+      // Hide global screen loader overlay
+      if (screenLoader) screenLoader.style.display = 'none';
     },
     (xhr) => {
       if (xhr && xhr.loaded && xhr.total) {
@@ -244,6 +253,7 @@ function loadGLBByIndex(idx) {
       alert("Error loading model: " + path);
       isLoading = false;
       enableDesignButtons();
+      if (screenLoader) screenLoader.style.display = 'none';
     }
   );
 }
@@ -492,11 +502,6 @@ function wireUI() {
       const startPos = camera.position.clone();
       const startTarget = controls.target.clone();
       
-      // Animation sequence:
-      // 1. Move camera right while rotating
-      // 2. Move camera up
-      // 3. Move camera left
-      // 4. Move camera down (return to start height)
       const animationDuration = 10000; // 10 seconds total
       const startTime = Date.now();
       
@@ -504,40 +509,26 @@ function wireUI() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / animationDuration, 1);
         
-        // Smooth easing function
-        const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        const easedProgress = easeInOutCubic(progress);
-        
         if (gltfScene) {
           // Rotate the model continuously during recording
           gltfScene.rotation.y += 0.01;
         }
         
-        // Camera movement sequence
-        // Phase 1: Move right (0-25%)
-        // Phase 2: Move up (25-50%)
-        // Phase 3: Move left (50-75%)
-        // Phase 4: Move down back to original (75-100%)
-        
         let currentPos = startPos.clone();
         let currentTarget = startTarget.clone();
         
         if (progress < 0.25) {
-          // Move right
           const phaseProgress = progress / 0.25;
           currentPos.x = startPos.x + (2 * phaseProgress);
           currentPos.z = startPos.z - (1 * phaseProgress);
         } else if (progress < 0.5) {
-          // Move up
           const phaseProgress = (progress - 0.25) / 0.25;
           currentPos.y = startPos.y + (1.5 * phaseProgress);
         } else if (progress < 0.75) {
-          // Move left
           const phaseProgress = (progress - 0.5) / 0.25;
           currentPos.x = (startPos.x + 2) - (4 * phaseProgress);
           currentPos.z = (startPos.z - 1) + (2 * phaseProgress);
         } else {
-          // Move down back to original
           const phaseProgress = (progress - 0.75) / 0.25;
           currentPos.y = (startPos.y + 1.5) - (1.5 * phaseProgress);
         }
@@ -551,9 +542,7 @@ function wireUI() {
         }
       }
       
-      // Start camera animation
       animateCamera();
-      
       alert("Recording for 10 seconds with smooth camera movement...");
       
       // Stop recording after 10 seconds
@@ -591,14 +580,14 @@ function wireUI() {
   });
 }
 
-/* ========== Create footer buttons (26) ========== */
+/* ========== Create footer buttons (28) ========== */
 function createFooterButtons() {
   const footer = document.getElementById('designFooter');
   footer.innerHTML = "";
 
   let activeBtn = null;
 
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < modelPaths.length; i++) {
     const box = document.createElement('div');
     box.className = 'design-box';
     box.id = `designBox${i + 1}`;
@@ -648,14 +637,14 @@ function createFooterButtons() {
 
 /* ========== Functions to disable/enable design buttons during loading ========== */
 function disableDesignButtons() {
-  for (let i = 1; i <= 26; i++) {
+  for (let i = 1; i <= modelPaths.length; i++) {
     const box = document.getElementById(`designBox${i}`);
     if (box) box.style.pointerEvents = 'none';
   }
 }
 
 function enableDesignButtons() {
-  for (let i = 1; i <= 26; i++) {
+  for (let i = 1; i <= modelPaths.length; i++) {
     const box = document.getElementById(`designBox${i}`);
     if (box && modelPaths[i-1] && modelPaths[i-1].trim() !== "") box.style.pointerEvents = 'auto';
   }
