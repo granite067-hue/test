@@ -3,14 +3,50 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bathroom (2x4) Unified Viewer — 26 Designs</title>
+  <title>Bathroom (2x4) Unified Viewer — 28 Designs</title>
 
-  <!-- three.js and extras -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <style>
+    /* Global Screen Loading Overlay Styles */
+    #screenLoader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.85);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #e6e6fa;
+      border-top: 5px solid #8a2be2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      color: #6a0dad;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
     /* Go to Top button */
     #goToTopBtn {
       display: none;
@@ -117,22 +153,6 @@
     .btn { padding:8px 10px; border-radius:6px; border:none; cursor:pointer; font-size:0.85rem; font-weight: 600; transition: all 0.25s ease; }
     .btn:hover { transform: translateY(-2px); }
     .clear-btn { background:#ff5722; color:white; display:none; flex: 1; }
-    .from-company-btn {
-      background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
-      color: white;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.25s ease;
-      flex: 1;
-    }
-    .from-company-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 180, 219, 0.4);
-    }
 
     #generateBtn, #fullscreenBtn, #downloadBtn {
       padding: 12px 18px;
@@ -234,39 +254,43 @@
       #generateBtn, #fullscreenBtn, #downloadBtn { padding: 12px 24px; font-size: 0.95rem; }
       #goToTopBtn { width: 45px; height: 45px; bottom: 80px; right: 15px; }
     }
-            .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(138, 43, 226, 0.1);
-            border: 2px solid #8a2be2;
-            color: #8a2be2;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            z-index: 100;
-        }
-        
-        .back-button:hover {
-            background: #8a2be2;
-            color: white;
-            transform: translateX(-5px);
-        }
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(138, 43, 226, 0.1);
+      border: 2px solid #8a2be2;
+      color: #8a2be2;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .back-button:hover {
+      background: #8a2be2;
+      color: white;
+      transform: translateX(-5px);
+    }
   </style>
 </head>
 <body>
-      <button class="back-button" onclick="history.back()">Back</button>
+  <div id="screenLoader">
+    <div class="spinner"></div>
+    <div class="loader-text">Loading 3D Scene... Please Wait</div>
+  </div>
+
+  <button class="back-button" onclick="history.back()">Back</button>
 
   <h1>Bathroom (2x4)</h1>
 
   <div class="upload-container">
-    <!-- L -->
     <div class="tile-section" data-category="L" id="sectionL">
       <h3>L Tile</h3>
       <input id="fileInputL" type="file" accept="image/*" />
@@ -278,7 +302,6 @@
       <div id="errorL" class="error"></div>
     </div>
 
-    <!-- D -->
     <div class="tile-section" data-category="D" id="sectionD">
       <h3>D Tile</h3>
       <input id="fileInputD" type="file" accept="image/*" />
@@ -290,7 +313,6 @@
       <div id="errorD" class="error"></div>
     </div>
 
-    <!-- HL -->
     <div class="tile-section" data-category="HL" id="sectionHL">
       <h3>HL Tile (optional)</h3>
       <input id="fileInputHL" type="file" accept="image/*" />
@@ -302,7 +324,6 @@
       <div id="errorHL" class="error"></div>
     </div>
 
-    <!-- F -->
     <div class="tile-section" data-category="F" id="sectionF">
       <h3>F Tile</h3>
       <input id="fileInputF" type="file" accept="image/*" />
@@ -321,7 +342,6 @@
     <button id="downloadBtn">Download Video</button>
   </div>
 
-  <!-- rotation toggle & speed -->
   <div class="controls-row">
     <label><input type="checkbox" id="autoRotateToggle" checked /> Auto-rotate</label>
     <label>
@@ -330,10 +350,7 @@
     </label>
   </div>
 
-  <!-- Go to Top Button -->
   <button id="goToTopBtn" title="Go to Top">↑</button>
-
-  <!-- Canvas will be appended by JS -->
 
   <footer id="designFooter" aria-hidden="true"></footer>
 
