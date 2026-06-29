@@ -1,3 +1,6 @@
+/* ========== Global Variables ========== */
+let currentTileCategory = null;
+
 /* ========== Put your GLB filenames/URLs here (23 entries) ========== */
 const modelPaths = [
   "/models/bathroom(18x12)1.glb", "/models/bathroom(18x12)2.glb", "/models/bathroom(18x12)3.glb",
@@ -89,14 +92,11 @@ let boundingBox = null;
 let modelLoadedFlag = false;
 let currentDesignIndex = -1;
 const textureLoader = new THREE.TextureLoader();
-let uploadedTextureL = null;
-let uploadedTextureD = null;
-let uploadedTextureHL = null;
-let uploadedTextureF = null;
+let uploadedTextureL = null, uploadedTextureD = null, uploadedTextureHL = null, uploadedTextureF = null;
 
 /* Auto rotation & clock */
 let autoRotate = true;
-let rotationSpeed = 0.6;
+let rotationSpeed = 0.5;
 const clock = new THREE.Clock();
 
 /* Loading flag to prevent concurrent loads */
@@ -111,7 +111,7 @@ function initThree() {
   scene.background = new THREE.Color(0xf0f0f0);
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-  camera.position.set(3, 2, 5);
+  camera.position.set(1.5, 2, 7);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -122,14 +122,9 @@ function initThree() {
 
   // Lights
   scene.add(new THREE.AmbientLight(0x404040, 0.5));
-  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-  dir.position.set(1,1,1);
-  scene.add(dir);
-  const pt = new THREE.PointLight(0xffffff, 0.6);
-  pt.position.set(0,0,2);
-  scene.add(pt);
-  const hemi = new THREE.HemisphereLight(0x87CEEB, 0x8B4513, 0.3);
-  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(1,1,1); scene.add(dir);
+  const pt = new THREE.PointLight(0xffffff, 0.6); pt.position.set(0,0,2); scene.add(pt);
+  const hemi = new THREE.HemisphereLight(0x87CEEB, 0x8B4513, 0.3); scene.add(hemi);
 
   // Environment map
   try {
@@ -142,10 +137,7 @@ function initThree() {
       'https://threejs.org/examples/textures/cube/SwedishRoyalCastle/nz.jpg'
     ]);
     scene.environment = env;
-  } catch (e) {
-    console.warn("Env map load failed", e);
-    scene.environment = null;
-  }
+  } catch (e) { console.warn("Env map load failed", e); scene.environment = null; }
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -181,6 +173,10 @@ function loadGLBByIndex(idx) {
 
   isLoading = true;
   disableDesignButtons();
+  
+  // Show global screen loader overlay
+  const screenLoader = document.getElementById('screenLoader');
+  if (screenLoader) screenLoader.style.display = 'flex';
 
   if (gltfScene) {
     scene.remove(gltfScene);
@@ -204,7 +200,7 @@ function loadGLBByIndex(idx) {
       boundingBox.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
       controls.minDistance = Math.max(0.01, maxDim * 0.05);
-      controls.maxDistance = Math.max(maxDim * 0.2, 2.5);
+      controls.maxDistance = Math.max(maxDim * 0.2, 1);
 
       gltfScene.traverse((child) => {
         if (!child.isMesh) return;
@@ -238,6 +234,9 @@ function loadGLBByIndex(idx) {
 
       isLoading = false;
       enableDesignButtons();
+      
+      // Hide global screen loader overlay
+      if (screenLoader) screenLoader.style.display = 'none';
     },
     (xhr) => {
       if (xhr && xhr.loaded && xhr.total) {
@@ -250,6 +249,7 @@ function loadGLBByIndex(idx) {
       alert("Error loading model: " + path);
       isLoading = false;
       enableDesignButtons();
+      if (screenLoader) screenLoader.style.display = 'none';
     }
   );
 }
@@ -284,15 +284,15 @@ function disposeObject(obj) {
 }
 
 /* ========== Upload / Drag-drop / Preview / Clear ========== */
-function setupUploadHandlers() {
-  const items = [
-    { inputId: "fileInputL", previewId: "previewL", clearId: "clearL", sectionId: "sectionL", errorId: "errorL", key: "L" },
-    { inputId: "fileInputD", previewId: "previewD", clearId: "clearD", sectionId: "sectionD", errorId: "errorD", key: "D" },
-    { inputId: "fileInputHL", previewId: "previewHL", clearId: "clearHL", sectionId: "sectionHL", errorId: "errorHL", key: "HL" },
-    { inputId: "fileInputF", previewId: "previewF", clearId: "clearF", sectionId: "sectionF", errorId: "errorF", key: "F" }
-  ];
+const itemsConfig = [
+  { inputId: "fileInputL", previewId: "previewL", clearId: "clearL", sectionId: "sectionL", errorId: "errorL", key: "L" },
+  { inputId: "fileInputD", previewId: "previewD", clearId: "clearD", sectionId: "sectionD", errorId: "errorD", key: "D" },
+  { inputId: "fileInputHL", previewId: "previewHL", clearId: "clearHL", sectionId: "sectionHL", errorId: "errorHL", key: "HL" },
+  { inputId: "fileInputF", previewId: "previewF", clearId: "clearF", sectionId: "sectionF", errorId: "errorF", key: "F" }
+];
 
-  items.forEach(item => {
+function setupUploadHandlers() {
+  itemsConfig.forEach(item => {
     const input = document.getElementById(item.inputId);
     const preview = document.getElementById(item.previewId);
     const clearBtn = document.getElementById(item.clearId);
@@ -323,6 +323,10 @@ function setupUploadHandlers() {
       section.classList.remove('has-image');
       clearBtn.style.display = 'none';
       if (errorEl) errorEl.style.display = 'none';
+      
+      // Remove from localStorage
+      localStorage.removeItem(`saved_tile_${item.key}`);
+
       if (item.key === 'L') { uploadedTextureL = null; }
       else if (item.key === 'D') { uploadedTextureD = null; }
       else if (item.key === 'HL') { uploadedTextureHL = null; }
@@ -351,31 +355,55 @@ function handleFile(file, preview, section, clearBtn, errorEl, key) {
   if (errorEl) errorEl.style.display = 'none';
   const reader = new FileReader();
   reader.onload = (ev) => {
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-    section.classList.add('has-image');
-    clearBtn.style.display = 'inline-block';
+    const dataUrl = ev.target.result;
+    
+    // Save string data to localStorage
+    try {
+      localStorage.setItem(`saved_tile_${key}`, dataUrl);
+    } catch(e) {
+      console.warn("localStorage quota exceeded. Storing image preview only.", e);
+    }
 
-    const objectUrl = URL.createObjectURL(file);
-    textureLoader.load(objectUrl, function(loadedTexture) {
-      loadedTexture.rotation = -Math.PI / 2;
-      loadedTexture.flipY = false;
-      loadedTexture.center.set(0.5, 0.5);
-      loadedTexture.wrapS = THREE.RepeatWrapping;
-      loadedTexture.wrapT = THREE.RepeatWrapping;
-      loadedTexture.repeat.set(1,1);
-
-      if (key === 'L') uploadedTextureL = loadedTexture;
-      else if (key === 'D') uploadedTextureD = loadedTexture;
-      else if (key === 'HL') uploadedTextureHL = loadedTexture;
-      else if (key === 'F') uploadedTextureF = loadedTexture;
-
-      if (gltfScene) applyUploadedTexturesToModel(gltfScene);
-
-      setTimeout(function() { URL.revokeObjectURL(objectUrl); }, 2000);
-    });
+    processAndApplyTexture(dataUrl, preview, section, clearBtn, key);
   };
   reader.readAsDataURL(file);
+}
+
+// Extracted logic to process and generate textures from base64 string
+function processAndApplyTexture(dataUrl, preview, section, clearBtn, key) {
+  preview.src = dataUrl;
+  preview.style.display = 'block';
+  section.classList.add('has-image');
+  clearBtn.style.display = 'inline-block';
+
+  textureLoader.load(dataUrl, (tex) => {
+    tex.rotation = -Math.PI / 2;
+    tex.flipY = false;
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 1);
+
+    if (key === 'L') uploadedTextureL = tex;
+    else if (key === 'D') uploadedTextureD = tex;
+    else if (key === 'HL') uploadedTextureHL = tex;
+    else if (key === 'F') uploadedTextureF = tex;
+
+    if (gltfScene) applyUploadedTexturesToModel(gltfScene);
+  });
+}
+
+// Function to check and load saved images from localStorage on startup
+function loadSavedTexturesFromStorage() {
+  itemsConfig.forEach(item => {
+    const savedData = localStorage.getItem(`saved_tile_${item.key}`);
+    if (savedData) {
+      const preview = document.getElementById(item.previewId);
+      const clearBtn = document.getElementById(item.clearId);
+      const section = document.getElementById(item.sectionId);
+      processAndApplyTexture(savedData, preview, section, clearBtn, item.key);
+    }
+  });
 }
 
 /* ========== Wire UI Buttons ========== */
@@ -413,10 +441,15 @@ function wireUI() {
     }
   });
 
-  // Download button with smooth camera movement
+  // Download button with a smooth, fully-utilized 10-second timeline
   document.getElementById("downloadBtn").addEventListener("click", async () => {
     if (isRecording) {
       alert("Recording already in progress!");
+      return;
+    }
+    
+    if (!modelLoadedFlag) {
+      alert("Please generate a model first!");
       return;
     }
     
@@ -431,20 +464,26 @@ function wireUI() {
       const originalCameraPosition = camera.position.clone();
       const originalTarget = controls.target.clone();
       
-      // Start video stream capture with 60fps for smoother video
-      const videoStream = renderer.domElement.captureStream(60);
-      
-      // Setup audio
+      // Setup audio infrastructure ahead of time
       const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       
-      // Create audio context for better audio handling
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const audioSource = audioContext.createMediaElementSource(audio);
       const audioDestination = audioContext.createMediaStreamDestination();
       audioSource.connect(audioDestination);
       audioSource.connect(audioContext.destination);
+
+      // Pre-warm the audio to prevent initial thread blocking
+      await audioContext.resume();
+      await audio.play();
+      
+      // Small pause (150ms) to let audio buffers fill and prevent any initial stutter
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // Capture stream - 30fps is universally accepted across devices
+      const videoStream = renderer.domElement.captureStream(30);
       
       // Combine video and audio tracks
       const combinedStream = new MediaStream([
@@ -452,10 +491,30 @@ function wireUI() {
         ...audioDestination.stream.getAudioTracks()
       ]);
       
+      // Detect universally supported video format
+      let selectedMimeType = "video/webm;codecs=vp9";
+      let fileExtension = "webm";
+      
+      const types = [
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // Standard H.264 MP4 (iOS/Android friendly)
+        "video/mp4",
+        "video/webm;codecs=h264",
+        "video/webm;codecs=vp9",
+        "video/webm"
+      ];
+      
+      for (const type of types) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          selectedMimeType = type;
+          if (type.includes("mp4")) fileExtension = "mp4";
+          break;
+        }
+      }
+      
       const chunks = [];
       const recorder = new MediaRecorder(combinedStream, { 
-        mimeType: "video/webm;codecs=vp9",
-        videoBitsPerSecond: 8000000 // 8 Mbps for better quality
+        mimeType: selectedMimeType,
+        videoBitsPerSecond: 5000000 // Clear 5 Mbps output
       });
       
       recorder.ondataavailable = (e) => { 
@@ -472,69 +531,66 @@ function wireUI() {
         audio.currentTime = 0;
         audioContext.close();
         
-        const blob = new Blob(chunks, { type: "video/webm" });
+        const blob = new Blob(chunks, { type: fileExtension === "mp4" ? "video/mp4" : "video/webm" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `bathroom_design_${currentDesignIndex + 1 || 1}.webm`;
+        a.download = `bathroom_design_${currentDesignIndex + 1 || 1}.${fileExtension}`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
         isRecording = false;
-        console.log("Recording completed successfully");
+        console.log(`Recording completed. Length: 10s. Format: .${fileExtension}`);
       };
       
-      // Start recording and audio
-      await audioContext.resume();
-      await audio.play();
+      // Kick off recorder
       recorder.start();
       
-      // Smooth camera animation sequence
+      // Smooth camera animation sequence parameters stretched out to exactly 10 seconds
       const startPos = camera.position.clone();
       const startTarget = controls.target.clone();
-      
-      const animationDuration = 10000; // 10 seconds total
-      const startTime = Date.now();
+      const animationDuration = 10000; // Perfect 10-second rendering timeline
+      const startTime = performance.now();
       
       function animateCamera() {
-        const elapsed = Date.now() - startTime;
+        if (!isRecording) return;
+        
+        const elapsed = performance.now() - startTime;
         const progress = Math.min(elapsed / animationDuration, 1);
         
-        // Smooth easing function
-        const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        const easedProgress = easeInOutCubic(progress);
-        
         if (gltfScene) {
-          // Rotate the model continuously during recording
-          gltfScene.rotation.y += 0.01;
+          // Keep steady model rotation during the 10 seconds
+          gltfScene.rotation.y += 0.008; 
         }
         
-        // Camera movement sequence
         let currentPos = startPos.clone();
-        let currentTarget = startTarget.clone();
         
+        // Split the full 10 seconds into 4 proportional 2.5-second cinematic movements
         if (progress < 0.25) {
-          // Move right
           const phaseProgress = progress / 0.25;
           currentPos.x = startPos.x + (2 * phaseProgress);
           currentPos.z = startPos.z - (1 * phaseProgress);
         } else if (progress < 0.5) {
-          // Move up
           const phaseProgress = (progress - 0.25) / 0.25;
+          currentPos.x = startPos.x + 2;
+          currentPos.z = startPos.z - 1;
           currentPos.y = startPos.y + (1.5 * phaseProgress);
         } else if (progress < 0.75) {
-          // Move left
           const phaseProgress = (progress - 0.5) / 0.25;
           currentPos.x = (startPos.x + 2) - (4 * phaseProgress);
           currentPos.z = (startPos.z - 1) + (2 * phaseProgress);
+          currentPos.y = startPos.y + 1.5;
         } else {
-          // Move down back to original
           const phaseProgress = (progress - 0.75) / 0.25;
+          currentPos.x = startPos.x - 2;
+          currentPos.z = startPos.z + 1;
           currentPos.y = (startPos.y + 1.5) - (1.5 * phaseProgress);
         }
         
         camera.position.copy(currentPos);
-        camera.lookAt(currentTarget);
+        camera.lookAt(startTarget);
         controls.update();
         
         if (progress < 1) {
@@ -542,14 +598,15 @@ function wireUI() {
         }
       }
       
-      // Start camera animation
-      animateCamera();
+      // Execute camera animation path smoothly
+      requestAnimationFrame(animateCamera);
       
-      alert("Recording for 10 seconds with smooth camera movement...");
-      
-      // Stop recording after 10 seconds
-      await new Promise(res => setTimeout(res, 10000));
-      recorder.stop();
+      // Stop recording automatically at exactly 10000ms
+      setTimeout(() => {
+        if (recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      }, animationDuration);
       
     } catch (e) {
       console.error("Recording failed:", e);
@@ -582,20 +639,20 @@ function wireUI() {
   });
 }
 
-/* ========== Create footer buttons (23) ========== */
+/* ========== Create footer buttons (28) ========== */
 function createFooterButtons() {
   const footer = document.getElementById('designFooter');
   footer.innerHTML = "";
 
   let activeBtn = null;
 
-  for (let i = 0; i < 23; i++) {
+  for (let i = 0; i < modelPaths.length; i++) {
     const box = document.createElement('div');
     box.className = 'design-box';
     box.id = `designBox${i + 1}`;
 
     const img = document.createElement('img');
-    img.src = designImages[i] || `https://via.placeholder.com/45x32?text=D${i + 1}`;
+    img.src = designImages[i] || `https://via.placeholder.com/40x30?text=D${i + 1}`;
     img.alt = `Design ${i + 1}`;
     box.appendChild(img);
 
@@ -621,32 +678,32 @@ function createFooterButtons() {
     footer.appendChild(box);
   }
 
-document.addEventListener("fullscreenchange", () => {
-  const footer = document.getElementById("designFooter");
-  if (document.fullscreenElement) {
-    footer.style.position = "fixed";
-    footer.style.bottom = "10px";
-    footer.style.left = "0";
-    footer.style.right = "0";
-    footer.style.zIndex = "999999";
-    footer.style.display = "flex";
-    footer.style.pointerEvents = "auto";
-  } else {
-    footer.style.display = "flex";
-  }
-});
+  document.addEventListener("fullscreenchange", () => {
+    const footer = document.getElementById("designFooter");
+    if (document.fullscreenElement) {
+      footer.style.position = "fixed";
+      footer.style.bottom = "10px";
+      footer.style.left = "0";
+      footer.style.right = "0";
+      footer.style.zIndex = "999999";
+      footer.style.display = "flex";
+      footer.style.pointerEvents = "auto";
+    } else {
+      footer.style.display = "flex";
+    }
+  });
 }
 
 /* ========== Functions to disable/enable design buttons during loading ========== */
 function disableDesignButtons() {
-  for (let i = 1; i <= 23; i++) {
+  for (let i = 1; i <= modelPaths.length; i++) {
     const box = document.getElementById(`designBox${i}`);
     if (box) box.style.pointerEvents = 'none';
   }
 }
 
 function enableDesignButtons() {
-  for (let i = 1; i <= 23; i++) {
+  for (let i = 1; i <= modelPaths.length; i++) {
     const box = document.getElementById(`designBox${i}`);
     if (box && modelPaths[i-1] && modelPaths[i-1].trim() !== "") box.style.pointerEvents = 'auto';
   }
@@ -656,6 +713,7 @@ function enableDesignButtons() {
 (function startup() {
   initThree();
   setupUploadHandlers();
+  loadSavedTexturesFromStorage(); // Rehydrate textures from localStorage on start
   wireUI();
   createFooterButtons();
 })();

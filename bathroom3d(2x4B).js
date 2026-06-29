@@ -109,6 +109,88 @@ let isLoading = false;
 /* Video recording flag */
 let isRecording = false;
 
+/* IndexedDB Management for Local Image Storage */
+const DB_NAME = "TileViewerStorage_2x4";
+const DB_VERSION = 1;
+const STORE_NAME = "cached_tiles";
+let db = null;
+
+function initIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        database.createObjectStore(STORE_NAME, { keyPath: "tileKey" });
+      }
+    };
+    request.onsuccess = (e) => {
+      db = e.target.result;
+      resolve();
+    };
+    request.onerror = (e) => {
+      console.error("IndexedDB error:", e.target.error);
+      reject(e.target.error);
+    };
+  });
+}
+
+function saveTileToLocal(key, base64Data) {
+  if (!db) return;
+  const transaction = db.transaction([STORE_NAME], "readwrite");
+  const store = transaction.objectStore(STORE_NAME);
+  store.put({ tileKey: key, data: base64Data });
+}
+
+function removeTileFromLocal(key) {
+  if (!db) return;
+  const transaction = db.transaction([STORE_NAME], "readwrite");
+  const store = transaction.objectStore(STORE_NAME);
+  store.delete(key);
+}
+
+function loadSavedTiles() {
+  if (!db) return;
+  const transaction = db.transaction([STORE_NAME], "readonly");
+  const store = transaction.objectStore(STORE_NAME);
+  const request = store.getAll();
+
+  request.onsuccess = (e) => {
+    const records = e.target.result;
+    records.forEach(record => {
+      const key = record.tileKey;
+      const base64Data = record.data;
+      
+      const preview = document.getElementById(`preview${key}`);
+      const section = document.getElementById(`section${key}`);
+      const clearBtn = document.getElementById(`clear${key}`);
+      
+      if (preview && section && clearBtn) {
+        preview.src = base64Data;
+        preview.style.display = 'block';
+        section.classList.add('has-image');
+        clearBtn.style.display = 'inline-block';
+        
+        textureLoader.load(base64Data, (tex) => {
+          tex.rotation = -Math.PI / 2;
+          tex.flipY = false;
+          tex.center.set(0.5, 0.5);
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 1);
+          
+          if (key === 'L') uploadedTextureL = tex;
+          else if (key === 'D') uploadedTextureD = tex;
+          else if (key === 'HL') uploadedTextureHL = tex;
+          else if (key === 'F') uploadedTextureF = tex;
+          
+          if (gltfScene) applyUploadedTexturesToModel(gltfScene);
+        });
+      }
+    });
+  };
+}
+
 /* ========== Initialize Three.js ========== */
 function initThree() {
   scene = new THREE.Scene();
@@ -327,6 +409,9 @@ function setupUploadHandlers() {
       section.classList.remove('has-image');
       clearBtn.style.display = 'none';
       if (errorEl) errorEl.style.display = 'none';
+      
+      removeTileFromLocal(item.key);
+      
       if (item.key === 'L') { uploadedTextureL = null; }
       else if (item.key === 'D') { uploadedTextureD = null; }
       else if (item.key === 'HL') { uploadedTextureHL = null; }
@@ -355,13 +440,15 @@ function handleFile(file, preview, section, clearBtn, errorEl, key) {
   if (errorEl) errorEl.style.display = 'none';
   const reader = new FileReader();
   reader.onload = (ev) => {
-    preview.src = ev.target.result;
+    const base64String = ev.target.result;
+    preview.src = base64String;
     preview.style.display = 'block';
     section.classList.add('has-image');
     clearBtn.style.display = 'inline-block';
 
-    const objectUrl = URL.createObjectURL(file);
-    textureLoader.load(objectUrl, (tex) => {
+    saveTileToLocal(key, base64String);
+
+    textureLoader.load(base64String, (tex) => {
       tex.rotation = -Math.PI / 2;
       tex.flipY = false;
       tex.center.set(0.5, 0.5);
@@ -375,8 +462,6 @@ function handleFile(file, preview, section, clearBtn, errorEl, key) {
       else if (key === 'F') uploadedTextureF = tex;
 
       if (gltfScene) applyUploadedTexturesToModel(gltfScene);
-
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
     });
   };
   reader.readAsDataURL(file);
@@ -417,7 +502,7 @@ function wireUI() {
     }
   });
 
-  // Download button with smooth camera movement
+  // Download button with a smooth, fully-utilized 10-second timeline
   document.getElementById("downloadBtn").addEventListener("click", async () => {
     if (isRecording) {
       alert("Recording already in progress!");
@@ -440,20 +525,26 @@ function wireUI() {
       const originalCameraPosition = camera.position.clone();
       const originalTarget = controls.target.clone();
       
-      // Start video stream capture with 60fps for smoother video
-      const videoStream = renderer.domElement.captureStream(60);
-      
-      // Setup audio
+      // Setup audio infrastructure ahead of time
       const audio = new Audio("/audio/background.mp3");
       audio.crossOrigin = "anonymous";
       audio.loop = true;
       
-      // Create audio context for better audio handling
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const audioSource = audioContext.createMediaElementSource(audio);
       const audioDestination = audioContext.createMediaStreamDestination();
       audioSource.connect(audioDestination);
       audioSource.connect(audioContext.destination);
+
+      // Pre-warm the audio to prevent initial thread blocking
+      await audioContext.resume();
+      await audio.play();
+      
+      // Small pause (150ms) to let audio buffers fill and prevent any initial stutter
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // Capture stream - 30fps is universally accepted across devices
+      const videoStream = renderer.domElement.captureStream(30);
       
       // Combine video and audio tracks
       const combinedStream = new MediaStream([
@@ -461,10 +552,30 @@ function wireUI() {
         ...audioDestination.stream.getAudioTracks()
       ]);
       
+      // Detect universally supported video format
+      let selectedMimeType = "video/webm;codecs=vp9";
+      let fileExtension = "webm";
+      
+      const types = [
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // Standard H.264 MP4 (iOS/Android friendly)
+        "video/mp4",
+        "video/webm;codecs=h264",
+        "video/webm;codecs=vp9",
+        "video/webm"
+      ];
+      
+      for (const type of types) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          selectedMimeType = type;
+          if (type.includes("mp4")) fileExtension = "mp4";
+          break;
+        }
+      }
+      
       const chunks = [];
       const recorder = new MediaRecorder(combinedStream, { 
-        mimeType: "video/webm;codecs=vp9",
-        videoBitsPerSecond: 8000000 // 8 Mbps for better quality
+        mimeType: selectedMimeType,
+        videoBitsPerSecond: 5000000 // Clear 5 Mbps output
       });
       
       recorder.ondataavailable = (e) => { 
@@ -481,60 +592,66 @@ function wireUI() {
         audio.currentTime = 0;
         audioContext.close();
         
-        const blob = new Blob(chunks, { type: "video/webm" });
+        const blob = new Blob(chunks, { type: fileExtension === "mp4" ? "video/mp4" : "video/webm" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `bathroom_design_${currentDesignIndex + 1 || 1}.webm`;
+        a.download = `bathroom_design_${currentDesignIndex + 1 || 1}.${fileExtension}`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
         isRecording = false;
-        console.log("Recording completed successfully");
+        console.log(`Recording completed. Length: 10s. Format: .${fileExtension}`);
       };
       
-      // Start recording and audio
-      await audioContext.resume();
-      await audio.play();
+      // Kick off recorder
       recorder.start();
       
-      // Smooth camera animation sequence
+      // Smooth camera animation sequence parameters stretched out to exactly 10 seconds
       const startPos = camera.position.clone();
       const startTarget = controls.target.clone();
-      
-      const animationDuration = 10000; // 10 seconds total
-      const startTime = Date.now();
+      const animationDuration = 10000; // Perfect 10-second rendering timeline
+      const startTime = performance.now();
       
       function animateCamera() {
-        const elapsed = Date.now() - startTime;
+        if (!isRecording) return;
+        
+        const elapsed = performance.now() - startTime;
         const progress = Math.min(elapsed / animationDuration, 1);
         
         if (gltfScene) {
-          // Rotate the model continuously during recording
-          gltfScene.rotation.y += 0.01;
+          // Keep steady model rotation during the 10 seconds
+          gltfScene.rotation.y += 0.008; 
         }
         
         let currentPos = startPos.clone();
-        let currentTarget = startTarget.clone();
         
+        // Split the full 10 seconds into 4 proportional 2.5-second cinematic movements
         if (progress < 0.25) {
           const phaseProgress = progress / 0.25;
           currentPos.x = startPos.x + (2 * phaseProgress);
           currentPos.z = startPos.z - (1 * phaseProgress);
         } else if (progress < 0.5) {
           const phaseProgress = (progress - 0.25) / 0.25;
+          currentPos.x = startPos.x + 2;
+          currentPos.z = startPos.z - 1;
           currentPos.y = startPos.y + (1.5 * phaseProgress);
         } else if (progress < 0.75) {
           const phaseProgress = (progress - 0.5) / 0.25;
           currentPos.x = (startPos.x + 2) - (4 * phaseProgress);
           currentPos.z = (startPos.z - 1) + (2 * phaseProgress);
+          currentPos.y = startPos.y + 1.5;
         } else {
           const phaseProgress = (progress - 0.75) / 0.25;
+          currentPos.x = startPos.x - 2;
+          currentPos.z = startPos.z + 1;
           currentPos.y = (startPos.y + 1.5) - (1.5 * phaseProgress);
         }
         
         camera.position.copy(currentPos);
-        camera.lookAt(currentTarget);
+        camera.lookAt(startTarget);
         controls.update();
         
         if (progress < 1) {
@@ -542,12 +659,15 @@ function wireUI() {
         }
       }
       
-      animateCamera();
-      alert("Recording for 10 seconds with smooth camera movement...");
+      // Execute camera animation path smoothly
+      requestAnimationFrame(animateCamera);
       
-      // Stop recording after 10 seconds
-      await new Promise(res => setTimeout(res, 10000));
-      recorder.stop();
+      // Stop recording automatically at exactly 10000ms
+      setTimeout(() => {
+        if (recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      }, animationDuration);
       
     } catch (e) {
       console.error("Recording failed:", e);
@@ -651,9 +771,17 @@ function enableDesignButtons() {
 }
 
 /* ========== Startup ========== */
-(function startup() {
+(async function startup() {
   initThree();
   setupUploadHandlers();
   wireUI();
   createFooterButtons();
+  
+  // Initialize IndexedDB cache and retrieve elements instantly
+  try {
+    await initIndexedDB();
+    loadSavedTiles();
+  } catch (e) {
+    console.error("Could not complete IndexedDB startup cycle:", e);
+  }
 })();
